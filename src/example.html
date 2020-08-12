@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smirk.js example</title>
+
+    <!-- Include styling for elements -->
+    <link rel="stylesheet" href="css/smirk.css">
+
+    <!-- Include Smirk renderer -->
+    <script src="js/smirk.js"></script>
+
+    <!-- Include standard Smirk interactive elements -->
+    <script src="js/smirk_standard.js"></script>
+
+    <!-- Include Smirk math plotting elements -->
+    <script src="js/smirk_math.js"></script>
+
+    <!-- D3 library for working with data -->
+    <script src="https://unpkg.com/d3@3/d3.min.js"></script>
+    <!-- Library for plotting functions -->
+    <script src="https://unpkg.com/function-plot@1/dist/function-plot.js"></script>
+</head>
+<body>
+    <div class="interactive-block">
+        <interactive>
+            button()
+                .withText("Test")
+                .onClick(function() {
+                    alert("Yeah!");
+                })
+        </interactive>
+    </div>
+
+    <div class="interactive-block">
+        <interactive>
+            plot()
+                .function('2*x + 3')
+        </interactive>
+    </div>
+</body>
+</html>

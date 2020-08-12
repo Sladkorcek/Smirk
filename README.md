@@ -1,16 +1,8 @@
-## Markdown to HTML converter
+# Smirk
 
-```bash
-# Convert example.md markdown file to test.html HTML file in the same directory 
-python convert.py example.md
+Smirk is a JavaScript library that allows you to add interactive elements to your page easily!
 
-# Convert example.md markdown file to special.html HTML file
-python convert.py example.md --output-file special.html
-```
-
-## To do sometime in the future
-
-Here is a list of things (stvari.si ;) ) that will potentially be part of `smirk` libraries one day. 
+## TODO
 
 ### General
 
