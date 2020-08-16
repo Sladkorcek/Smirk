@@ -1,3 +1,44 @@
+// URL's for other parts of this library
+const SMIRK_STANDARD = 'js/smirk_standard.js';
+const SMIRK_MATH = 'js/smirk_math.js';
+
+const INTERACTIVE_ELEMENTS_LIBRARIES = {
+    'button': SMIRK_STANDARD,
+    'flashcard': SMIRK_STANDARD,
+    'text': SMIRK_STANDARD,
+    'multipleChoice': SMIRK_STANDARD,
+    'svg': SMIRK_MATH,
+    'plot': SMIRK_MATH,
+};
+
+const REQUIREMENTS = {};
+REQUIREMENTS[SMIRK_MATH] = [
+    'https://unpkg.com/d3@3/d3.min.js',
+    'https://unpkg.com/function-plot@1/dist/function-plot.js'
+];
+
+function loadScripts(scripts, callback) {
+    if (scripts.length <= 0) {
+        callback();
+    } else {
+        let script = scripts.shift();
+        console.log('Loading library: ' + script);
+        loadScript(script, function() {
+            // The script has been loaded, load the next one
+            loadScripts(scripts, callback);
+        });
+    }
+}
+
+function loadLibrary(library, callback) {
+    let allLibraries = [ library ];
+    if (REQUIREMENTS.hasOwnProperty(library)) {
+        let libraryRequirements = REQUIREMENTS[library];
+        allLibraries = allLibraries.concat(libraryRequirements);
+    }
+    loadScripts(allLibraries, callback);
+}
+
 // window.onload executes after EVERYTHING is loaded, including images
 // The interactive blocks can start rendering before images, so
 // find a different way to detect if document has been loaded
@@ -16,6 +57,10 @@ function renderAll() {
 function renderInteractiveBlock(interactiveBlock) {
 
     let blockCode = interactiveBlock.innerHTML;
+
+    // If we are re-rendering elements, current interactive block contents
+    // should be removed.
+    clearInteractiveBlock(interactiveBlock);
 
     try {
         let render = constructRenderingFunction(blockCode);
@@ -51,8 +96,33 @@ function renderInteractiveBlock(interactiveBlock) {
         }
         
     } catch (error) {
-        let exceptionElement = exception().withMessage(error);
-        interactiveBlock.parentElement.appendChild(exceptionElement.getElement());
+        // If the error is a ReferenceError, the user called a function that
+        // does not exist. That most likely means that a sublibrary was not
+        // loaded yet, so we will load it.
+        if (error instanceof ReferenceError) {
+            // Because JavaScript's ReferenceError object does not
+            // contain name of the variable that caused it, we will extract it from
+            // error message string.
+            let variableName = error.message.split(' ', 1)[0];
+
+            if (INTERACTIVE_ELEMENTS_LIBRARIES.hasOwnProperty(variableName)) {
+                let requiredLibrary = INTERACTIVE_ELEMENTS_LIBRARIES[variableName];
+
+                // Display loading library text
+                interactiveBlock.parentElement.appendChild(exception().withMessage("Loading smirk library").getElement());
+
+                loadLibrary(requiredLibrary, function() {
+                    // After the correct smirk library is loaded, re-render this
+                    // interactive object
+                    renderInteractiveBlock(interactiveBlock);
+                });
+            } else {
+                interactiveBlock.parentElement.appendChild(exception().withMessage(error).getElement());
+            }
+        } else {
+            interactiveBlock.parentElement.appendChild(exception().withMessage(error).getElement());
+        }
+
     }
 
 }
@@ -62,6 +132,16 @@ function constructRenderingFunction(code) {
     let renderingFunctionCode = 'return (' + code + ')';
     return new Function(renderingFunctionCode);
 
+}
+
+function clearInteractiveBlock(interactiveBlock) {
+    let parent = interactiveBlock.parentElement;
+    let children = parent.children;
+    for (let i = children.length - 1; i >= 0; i--) {
+        if (children[i].tagName.toUpperCase() !== 'INTERACTIVE') {
+            parent.removeChild(children[i]);
+        }
+    }
 }
 
 let idCounter = 1;
@@ -91,7 +171,6 @@ class Exception extends InteractiveElement {
         this.element.className = "exception";
     }
     withMessage(error) {
-        console.log(error);
         this.element.innerText = error;
         return this;
     }
@@ -99,4 +178,28 @@ class Exception extends InteractiveElement {
 
 function exception() {
     return new Exception();
+}
+
+function loadScript(url, callback){
+    var script = document.createElement("script")
+    script.type = "text/javascript";
+
+    if (script.readyState){  // IE
+        script.onreadystatechange = function(){
+            if (script.readyState == "loaded" ||
+                    script.readyState == "complete"){
+                script.onreadystatechange = null;
+                if (callback)
+                    callback();
+            }
+        };
+    } else {  // Others
+        script.onload = function(){
+            if (callback)
+                callback();
+        };
+    }
+
+    script.src = url;
+    document.getElementsByTagName("head")[0].appendChild(script);
 }
