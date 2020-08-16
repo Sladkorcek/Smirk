@@ -18,25 +18,17 @@
     <script src="js/smirk_math.js"></script>
 
     <!-- D3 library for working with data -->
-    <script src="https://unpkg.com/d3@3/d3.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <!-- Library for plotting functions -->
     <script src="https://unpkg.com/function-plot@1/dist/function-plot.js"></script>
 </head>
 <body>
     <div class="interactive-block">
         <interactive>
-            button()
-                .withText("Test")
-                .onClick(function() {
-                    alert("Yeah!");
-                })
-        </interactive>
-    </div>
-
-    <div class="interactive-block">
-        <interactive>
-            plot()
-                .function('2*x + 3')
+            svg()
+                .width(100)
+                .height(100)
+                .ellipse(50, 50, 20, 10, { fill: "red" })
         </interactive>
     </div>
 </body>

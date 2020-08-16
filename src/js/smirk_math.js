@@ -141,6 +141,63 @@ class Plot extends InteractiveElement {
     }
 }
 
+class Svg extends InteractiveElement {
+    constructor() {
+        super(document.createElement("div"));
+        this.svg = d3.select(this.element).append("svg");
+    }
+    width(width) {
+        this.svg.attr("width", width);
+        return this;
+    }
+    height(height) {
+        this.svg.attr("height", height);
+        return this;
+    }
+    applyStyling(element, styling) {
+        if (!styling)
+            return;
+        
+        for (const [key, value] of Object.entries(styling)) {
+            element.style(key, value);
+        }
+    }
+    rectangle(x, y, width, height, styling) {
+        let newElement = this.svg.append("rect")
+            .attr("x", x).attr("y", y)
+            .attr("width", width).attr("height", height);
+        this.applyStyling(newElement, styling);
+        return this;
+    }
+    ellipse(centerX, centerY, radiusX, radiusY, styling) {
+        let newElement = this.svg.append("ellipse")
+            .attr("cx", centerX)
+            .attr("cy", centerY)
+            .attr("rx", radiusX)
+            .attr("ry", radiusY);
+        this.applyStyling(newElement, styling);
+        return this;
+    }
+    circle(centerX, centerY, radius, styling) {
+        let newElement = this.svg.append("circle")
+            .attr("cx", centerX)
+            .attr("cy", centerY)
+            .attr("r", radius);
+        this.applyStyling(newElement, styling);
+        return this;
+    }
+    square(x, y, size, styling) {
+        return this.rectangle(x, y, size, size, styling);
+    }
+    point(x, y, styling) {
+        return this.circle(x, y, 3, styling);
+    }
+}
+
 function plot() {
     return new Plot();
+}
+
+function svg() {
+    return new Svg();
 }
