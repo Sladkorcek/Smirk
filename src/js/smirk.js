@@ -1,6 +1,6 @@
 // URL's for other parts of this library
-const SMIRK_STANDARD = '/static/editor/js/smirk_standard.js';
-const SMIRK_MATH = '/static/editor/js/smirk_math.js';
+const SMIRK_STANDARD = 'js/smirk_standard.js';
+const SMIRK_MATH = 'js/smirk_math.js';
 
 const INTERACTIVE_ELEMENTS_LIBRARIES = {
     'button': SMIRK_STANDARD,
